@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI,HTTPException, Depends
 
 from pydantic import BaseModel
 from typing import List, Annotated
@@ -33,6 +33,20 @@ db_dependency = Annotated[Session,Depends(get_db)]
 @app.get("/")
 async def root(): 
     return {"message":"Hello World"}
+
+@app.get("/questions/{question_id}")
+async def read_questions(question_id:int, db:db_dependency):
+    res=db.query(models.Questions).filter(models.Questions.id == question_id).first()
+    if not res:
+        raise HTTPException(status_code=404, detail="Question not found")
+    return res
+    
+@app.get("/choices/{question_id}")
+async def read_choices(question_id:int, db:db_dependency):
+    res=db.query(models.Choices).filter(models.Choices.question_id == question_id).all()
+    if not res:
+        raise HTTPException(status_code=404, detail="Choices not found")
+    return res
 
 
 @app.post("/questions/")

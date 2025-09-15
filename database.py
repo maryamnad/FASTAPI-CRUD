@@ -3,8 +3,16 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+import os
+from dotenv import load_dotenv
 
-URL_DATABASE='postgresql://postgres:test1234@localhost:5432/Quiz'
+# Load .env file
+load_dotenv()
+
+URL_DATABASE=os.getenv('URL_DATABASE')
+
+if not URL_DATABASE:
+    raise ValueError("DATABASE_URL is not set in the .env file")
 
 engine=create_engine(URL_DATABASE)
 
